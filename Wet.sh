@@ -1,23 +1,6 @@
 use 236363myDB//1db.createCollection('results')var date = Date()var post={    "Res":1,    "ID1":123456789,    "ID2":123456789,    "Date":date}db.results.insert(post)//2db.getCollection('documents').find({}).forEach(function(doc){    var values = doc.query_text.split(" ");    sum=0;    for (i = 0; i < values.length; i++)    {        var count = doc.content.split(' ' + values[i] + ' ').length-1;        sum=sum+count;    }    doc.rank=sum;    db.documents.save(doc);});var documents=db.getCollection('documents').find({}).sort({    'query_num':1,    'rank':-1,    first_name:1,    last_name:1})var finalResult={    "Res":2,    "documents":documents.toArray()}db.results.insert(finalResult);
 
 //3
-var res = db.results.aggregate(
-{
-    $unwind : "$documents"
-},
-{
-    $match : {Res : 2}
-},
-{
-    $sort : {"documents.rank" : -1, "documents.query_num" : 1}
-},
-{
-    $limit : 2
-},
-{
-   $project: { "_id" : 0 , "query_text" : "$documents.query_text" } 
-}
-).result[0]
-
+var res = db.results.aggregate({$unwind : "$documents"},{$match : {Res : 2}},{$sort : {"documents.rank" : -1, "documents.query_num" : 1}},{$limit : 1},{$project: { "_id" : 0 , "query_text" : "$documents.query_text" }}).result[0]
 res.Res = 3
-db.results.insert(res)//5var myDocsCount=db.getCollection('documents').find({ $or: [ { 'last_name': 'Levi' }, { 'date': { $gte : new ISODate("2015-12-12T01:00:00") }} ] }).count()var result5={    'Res':5,    'count':myDocsCount}db.results.insert(result5);
+db.results.insert(res)//4var result_4 = db.documents.aggregate({$group : {_id : '$query_num',avg : {$avg : "$rank"},min : {$min : "$rank"},rank : {$max : "$rank"}}}, {$sort : {_id : 1}}).resultresult_4.forEach(function(doc){    doc.content = db.documents.find({query_num : doc._id}).sort({first_name : 1 , last_name : 1}).limit(1)[0].content})var res4 = {"Res" : 4}res4.query_statistics = result_4db.results.insert(res4)//5var myDocsCount=db.getCollection('documents').find({ $or: [ { 'last_name': 'Levi' }, { 'date': { $gte : new ISODate("2015-12-12T01:00:00") }} ] }).count()var result5={    'Res':5,    'count':myDocsCount}db.results.insert(result5);
