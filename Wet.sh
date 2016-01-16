@@ -20,4 +20,4 @@ var res = db.results.aggregate(
 ).result[0]
 
 res.Res = 3
-db.results.insert(res)
+db.results.insert(res)//5var myDocsCount=db.getCollection('documents').find({ $or: [ { 'last_name': 'Levi' }, { 'date': { $gte : new ISODate("2015-12-12T01:00:00") }} ] }).count()var result5={    'Res':5,    'count':myDocsCount}db.results.insert(result5);
